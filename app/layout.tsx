@@ -1,4 +1,5 @@
 import './globals.css';
+import ThemeToggle from './components/ThemeToggle';
 
 export const metadata = {
   title: 'Reservana — Beach Club PMS',
@@ -7,8 +8,11 @@ export const metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="es">
-      <body style={{ fontFamily: 'system-ui, sans-serif', background: '#0b0b0b', color: '#f4f4f4', margin: 0 }}>{children}</body>
+    <html lang="es" className="light">
+      <body style={{ fontFamily: 'system-ui, sans-serif', background: 'var(--bg)', color: 'var(--fg)', margin: 0, minHeight: '100vh' }}>
+        <ThemeToggle />
+        {children}
+      </body>
     </html>
   );
 }
