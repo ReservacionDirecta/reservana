@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reservana — Wireframe / Prototipo</title>
+<style>
+:root{--red:#dc2626;--blue:#2563eb;--gold:#eab308;--bg:#0b0b0b;--card:#111;--text:#f4f4f4;--muted:#9ca3af;--border:#1f1f1f;--ok:#22c55e;--warn:#eab308;}
+*{box-sizing:border-box;margin:0;padding:0;font-family:system-ui,-apple-system,sans-serif;}
+body{background:var(--bg);color:var(--text);line-height:1.5;padding:1.5rem;max-width:1100px;margin:0 auto;}
+h1{font-size:1.6rem;font-weight:700;margin-bottom:.25rem;color:var(--red);letter-spacing:-.02em;}
+h2{font-size:1.05rem;font-weight:600;margin:1.5rem 0 .75rem;color:var(--blue);border-left:3px solid var(--blue);padding-left:.6rem;}
+h3{font-size:.95rem;font-weight:600;color:var(--gold);margin:1rem 0 .5rem;}
+.subtitle{color:var(--muted);font-size:.9rem;margin-bottom:1.25rem;}
+.card{background:var(--card);border:1px solid var(--border);border-radius:1rem;padding:1.25rem;margin-bottom:1.25rem;}
+.row{display:flex;gap:1rem;flex-wrap:wrap;}
+.col{flex:1 1 260px;min-width:260px;}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:.6rem;}
+
+/* Beach area cards */
+.area{border:1px solid var(--border);border-radius:.75rem;padding:.6rem;text-align:center;cursor:pointer;transition:transform .1s ease, border-color .2s;}
+.area:hover{transform:translateY(-2px);border-color:var(--blue);}
+.area.selected{border-color:var(--gold);box-shadow:0 0 0 2px var(--gold);}
+.area .label{font-weight:700;font-size:.85rem;}
+.area .meta{font-size:.7rem;color:var(--muted);margin-top:.15rem;}
+.area .badge{display:inline-block;font-size:.65rem;padding:.1rem .35rem;border-radius:.25rem;margin-top:.2rem;background:var(--red);color:#fff;}
+.area .badge.green{background:var(--ok);}
+
+button{background:var(--blue);color:#fff;border:none;border-radius:.5rem;padding:.55rem 1rem;font-weight:600;cursor:pointer;transition:background .15s;}
+button:hover{background:#1d4ed8;}
+button.secondary{background:transparent;border:1px solid var(--blue);color:var(--blue);}
+button.danger{background:var(--red);}
+button.danger:hover{background:#b91c1c;}
+
+input,select{background:#0a0a0a;border:1px solid var(--border);color:var(--text);border-radius:.5rem;padding:.45rem .6rem;width:100%;margin-top:.25rem;}
+label{font-size:.8rem;color:var(--muted);}
+
+.qr-box{border:2px dashed var(--gold);border-radius:1rem;padding:1rem;text-align:center;background:#0a0a0a;}
+.qr-box .code{font-family:monospace;font-size:2.2rem;letter-spacing:.25rem;color:var(--gold);margin:.3rem 0;}
+.qr-box p{font-size:.75rem;color:var(--muted);}
+
+.status{font-weight:700;font-size:.85rem;padding:.2rem .5rem;border-radius:.25rem;display:inline-block;}
+.status.ok{color:var(--ok);}
+.status.busy{color:var(--red);}
+.status.wait{color:var(--gold);}
+
+@media (max-width:640px){.row{flex-direction:column;}.col{min-width:100%;}}
+</style>
+</head>
+<body>
+
+<h1>Reservana</h1>
+<p class="subtitle">Clubes de playa — Reservas, mapa y consumo. Prototipo interactivo. — Mapa de áreas, reservas, consumo y QR. Prototipo interactivo.</p>
+
+<div class="card">
+  <h2>1. Mapa de la playa — Club "Playa Sol" (Margarita)</h2>
+  <p style="font-size:.85rem;color:var(--muted);margin-bottom:.75rem;">Zona: frente al mar (vista) / sombra parcial. Tipos: 2, 4, 6-12 personas.</p>
+  <div class="grid" id="mapGrid"></div>
+  <p style="font-size:.75rem;color:var(--muted);margin-top:.6rem;">Haz clic en un área para reservar o ver estado.</p>
+</div>
+
+<div class="row">
+  <div class="col card">
+    <h3>Estado de la reserva</h3>
+    <p><span class="status ok" id="resStatus">Libre</span></p>
+    <p style="font-size:.85rem;color:var(--muted);margin-top:.25rem;" id="resSummary">Selecciona un área.</p>
+    <form id="resForm" onsubmit="event.preventDefault();reserve();">
+      <label for="resName">Nombre del huésped</label>
+      <input type="text" id="resName" placeholder="Ej. Carlos / Familia Pérez" />
+      <label for="resTime" style="margin-top:.5rem;display:block;">Hora de inicio</label>
+      <input type="time" id="resTime" value="10:00" />
+      <label for="resDur">Duración (horas)</label>
+      <select id="resDur"><option>2</option><option selected>4</option><option>6</option></select>
+      <div style="margin-top:.75rem;display:flex;gap:.5rem;flex-wrap:wrap;">
+        <button type="submit">Confirmar reserva</button>
+        <button type="button" class="secondary" onclick="clearRes()">Limpiar</button>
+      </div>
+    </form>
+  </div>
+
+  <div class="col card">
+    <h3>QR — Acceso y consumo</h3>
+    <p style="font-size:.8rem;color:var(--muted);margin-bottom:.5rem;">Al confirmar, se genera un código para el huésped.</p>
+    <div class="qr-box" id="qrBox">
+      <div class="code">—</div>
+      <p>Escanea para ver tu reserva y ordenar.</p>
+    </div>
+    <div style="margin-top:.75rem;">
+      <h3>Consumo (simulado)</h3>
+      <div style="font-size:.8rem;color:var(--muted);margin-bottom:.25rem;">Añade productos mientras la reserva está activa.</div>
+      <div style="display:flex;gap:.25rem;flex-wrap:wrap;" id="consBtns">
+        <button onclick="addCons('Cerveza')">+ Cerveza</button>
+        <button onclick="addCons('Agua')">+ Agua</button>
+        <button onclick="addCons('Plato playa')">+ Plato playa</button>
+      </div>
+      <ul style="font-size:.8rem;margin-top:.5rem;padding-left:1rem;color:var(--muted);" id="consList"><li>Ningún consumo registrado.</li></ul>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <h2>2. Panel del club — Vista en vivo</h2>
+  <div style="display:flex;gap:1rem;flex-wrap:wrap;">
+    <div style="flex:1 1 200px;background:#0a0a0a;border:1px solid var(--border);border-radius:.75rem;padding:.75rem;">
+      <h4 style="font-size:.85rem;color:var(--blue);margin-bottom:.5rem;">Ocupación hoy</h4>
+      <p style="font-size:1.4rem;font-weight:700;color:var(--red);">72%</p>
+      <p style="font-size:.75rem;color:var(--muted);">12 de 18 áreas ocupadas / reservadas</p>
+    </div>
+    <div style="flex:1 1 200px;background:#0a0a0a;border:1px solid var(--border);border-radius:.75rem;padding:.75rem;">
+      <h4 style="font-size:.85rem;color:var(--gold);margin-bottom:.5rem;">Consumo acumulado</h4>
+      <p style="font-size:1.4rem;font-weight:700;color:var(--blue);">$148</p>
+      <p style="font-size:.75rem;color:var(--muted);">Hoy, 4 reservas con consumo</p>
+    </div>
+    <div style="flex:1 1 200px;background:#0a0a0a;border:1px solid var(--border);border-radius:.75rem;padding:.75rem;">
+      <h4 style="font-size:.85rem;color:var(--ok);margin-bottom:.5rem;">Estado del mapa</h4>
+      <p style="font-size:1.4rem;font-weight:700;color:var(--ok);">En vivo</p>
+      <p style="font-size:.75rem;color:var(--muted);">Actualiza cada 15 segundos</p>
+    </div>
+  </div>
+</div>
+
+<div class="card" style="border-left:4px solid var(--red);">
+  <h2>3. Modelo y próximos pasos</h2>
+  <p><strong>Nombre propuesto:</strong> Reservana (módulo dentro de Otelia.com).</p>
+  <p><strong>Mercado inicial:</strong> Beach clubs de Margarita (fase 1), expansión a islas del Caribe.</p>
+  <p><strong>Inversión MVP (3 meses):</strong> ~$5.300 USD — desarrollo, diseño de mapa y despliegue.</p>
+  <p><strong>Ingresos estimados (mes 6):</strong> 8 clubs × $60/mes + consumo = ~$1.500/mes recurrentes.</p>
+  <p><strong>Entregable inmediato:</strong> Este wireframe + pitch + especificación técnica para validación con 2-3 clubs piloto.</p>
+</div>
+
+<script>
+  const areas = [
+    {id:1, label:"A-1 (2 pers)", type:"2 personas", meta:"Vista mar · Sombra", status:"free", color:"free"},
+    {id:2, label:"A-2 (4 pers)", type:"4 personas", meta:"Vista mar · Sol", status:"free", color:"free"},
+    {id:3, label:"A-3 (6 pers)", type:"6-12 personas", meta:"Vista mar · Sombra", status:"reserved", color:"reserved"},
+    {id:4, label:"A-4 (2 pers)", type:"2 personas", meta:"Lateral · Sombra", status:"free", color:"free"},
+    {id:5, label:"A-5 (4 pers)", type:"4 personas", meta:"Vista mar · Sombra", status:"busy", color:"busy"},
+    {id:6, label:"A-6 (4 pers)", type:"4 personas", meta:"Vista mar · Sol", status:"free", color:"free"},
+    {id:7, label:"A-7 (12 pers)", type:"6-12 personas", meta:"Vista mar · Sombra", status:"reserved", color:"reserved"},
+    {id:8, label:"A-8 (2 pers)", type:"2 personas", meta:"Lateral · Sombra", status:"free", color:"free"},
+  ];
+  let selectedId = null;
+  let activeRes = null;
+  let consumption = [];
+
+  function renderMap(){
+    const g = document.getElementById('mapGrid');
+    g.innerHTML = '';
+    areas.forEach(a => {
+      const el = document.createElement('div');
+      el.className = 'area' + (selectedId === a.id ? ' selected' : '');
+      const badgeText = a.status === 'free' ? 'Libre' : a.status === 'reserved' ? 'Reservada' : 'Ocupada';
+      const badgeClass = a.status === 'free' ? 'badge green' : 'badge';
+      el.innerHTML = `<div class="label">${a.label}</div><div class="meta">${a.type}</div><div class="meta">${a.meta}</div><div class="${badgeClass}">${badgeText}</div>`;
+      el.onclick = () => selectArea(a.id);
+      g.appendChild(el);
+    });
+  }
+
+  function selectArea(id){
+    selectedId = id;
+    const a = areas.find(x => x.id === id);
+    document.getElementById('resStatus').textContent = a.status === 'free' ? 'Libre' : a.status === 'reserved' ? 'Reservada' : 'Ocupada';
+    document.getElementById('resStatus').className = 'status ' + (a.status === 'free' ? 'ok' : a.status === 'busy' ? 'busy' : 'wait');
+    document.getElementById('resSummary').textContent = a.status === 'free' ? 'Selecciona esta área para reservar.' : 'Área no disponible para reserva.';
+    renderMap();
+  }
+
+  function reserve(){
+    if (!selectedId){ alert('Selecciona un área primero.'); return; }
+    const a = areas.find(x => x.id === selectedId);
+    if (a.status !== 'free') { alert('Esta área no está libre.'); return; }
+    const name = document.getElementById('resName').value || 'Huésped';
+    const time = document.getElementById('resTime').value;
+    a.status = 'reserved';
+    activeRes = { area: a.id, name, time, duration: document.getElementById('resDur').value };
+    consumption = [];
+    document.getElementById('resStatus').textContent = 'Reservada';
+    document.getElementById('resStatus').className = 'status wait';
+    document.getElementById('resSummary').textContent = `Reserva para ${name} · ${a.type} · ${time} (${activeRes.duration}h).`;
+    document.getElementById('qrBox').innerHTML = `<div class="code">QR-${a.id}-${Date.now().toString().slice(-4)}</div><p>Reserva #${a.id} — ${name}</p>`;
+    renderMap();
+  }
+
+  function clearRes(){
+    selectedId = null;
+    activeRes = null;
+    consumption = [];
+    document.getElementById('resStatus').textContent = 'Libre';
+    document.getElementById('resStatus').className = 'status ok';
+    document.getElementById('resSummary').textContent = 'Selecciona un área.';
+    document.getElementById('resName').value = '';
+    document.getElementById('qrBox').innerHTML = `<div class="code">—</div><p>Escanea para ver tu reserva y ordenar.</p>`;
+    document.getElementById('consList').innerHTML = '<li>Ningún consumo registrado.</li>';
+    renderMap();
+  }
+
+  function addCons(product){
+    if (!activeRes) { alert('Confirma una reserva primero.'); return; }
+    consumption.push(product);
+    const li = document.createElement('li');
+    li.textContent = product;
+    const list = document.getElementById('consList');
+    if (consumption.length === 1) list.innerHTML = '';
+    list.appendChild(li);
+  }
+
+  renderMap();
+</script>
+
+</body>
+</html>
