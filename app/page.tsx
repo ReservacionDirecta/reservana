@@ -10,6 +10,7 @@ import { BeachReservation } from './models/reservation';
 import { BeachConsumption } from './models/consumption';
 
 export default function HomePage() {
+  const [selectedIds, setSelectedIds] = useState<(string | number)[]>([]);
   const [selectedArea, setSelectedArea] = useState<BeachArea | null>(null);
   const [areas] = useState<BeachArea[]>([
     { id: 1, clubId: 'club-01', type: '2', meta: { vista_mar: true, sombra: false }, coordenadas: 'A-1' },
@@ -26,8 +27,11 @@ export default function HomePage() {
   const [statusMap, setStatusMap] = useState<Record<number, 'libre'|'reservada'|'ocupada'|'consumiendo'>>({});
 
   const handleSelect = (id: string | number) => {
-    const area = areas.find(a => a.id === id);
-    if (area) setSelectedArea(area);
+    const isSelected = selectedIds.includes(id);
+    const newIds = isSelected ? selectedIds.filter(i => i !== id) : [...selectedIds, id];
+    setSelectedIds(newIds);
+    const firstArea = newIds.length > 0 ? areas.find(a => a.id === newIds[newIds.length - 1]) || null : null;
+    setSelectedArea(firstArea);
   };
 
   const handleReserve = (data: { name: string; time: string; duration: string }) => {
@@ -64,7 +68,7 @@ export default function HomePage() {
               area={area}
               onSelect={handleSelect}
               status={statusMap[area.id] || 'libre'}
-              selected={selectedArea?.id === area.id}
+              selected={selectedIds.includes(area.id)}
             />
           ))}
         </div>
@@ -86,6 +90,24 @@ export default function HomePage() {
           <ConsumptionPanel consumption={cons} onAdd={handleAdd} />
         </section>
       </div>
+
+      <section style={{ marginTop: '1.25rem', padding: '1rem', background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '1rem', borderLeft: '4px solid var(--blue)' }}>
+        <h3 style={{ color: 'var(--blue)', fontSize: '1rem', marginBottom: '.75rem' }}>Detalles de sombrillas / áreas seleccionadas</h3>
+        {selectedIds.length === 0 ? (
+          <p style={{ color: 'var(--muted)', fontSize: '.85rem' }}>Selecciona una o varias áreas para ver sus detalles.</p>
+        ) : (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: '.75rem' }}>
+            {areas.filter(area => selectedIds.includes(area.id)).map(area => (
+              <div key={area.id} style={{ background: 'var(--card)', border: '1px solid var(--border)', borderRadius: '.75rem', padding: '.75rem' }}>
+                <p style={{ fontWeight: 700, color: 'var(--fg)', fontSize: '.9rem', margin: '0 0 .25rem' }}>A-{area.id}</p>
+                <p style={{ fontSize: '.75rem', color: 'var(--muted)', margin: '.1rem 0' }}>Tipo: <span style={{ color: 'var(--fg)', fontWeight: 600 }}>{area.type === '2' ? '2 personas' : area.type === '4' ? '4 personas' : '6-12 personas'}</span></p>
+                <p style={{ fontSize: '.75rem', color: 'var(--muted)', margin: '.1rem 0' }}>Vista al mar: <span style={{ color: area.meta?.vista_mar ? 'var(--blue)' : 'var(--red)', fontWeight: 600 }}>{area.meta?.vista_mar ? 'Sí' : 'No'}</span></p>
+                <p style={{ fontSize: '.75rem', color: 'var(--muted)', margin: '.1rem 0' }}>Sombra: <span style={{ color: area.meta?.sombra ? 'var(--gold)' : 'var(--red)', fontWeight: 600 }}>{area.meta?.sombra ? 'Sí' : 'No'}</span></p>
+              </div>
+            ))}
+          </div>
+        )}
+      </section>
 
       <section style={{ marginTop: '2rem', padding: '1rem', background: 'var(--card)', border: '1px solid var(--border)', borderRadius: '1rem', borderLeft: '4px solid var(--red)' }}>
         <h3 style={{ color: 'var(--red)' }}>Modelo y próximos pasos</h3>
