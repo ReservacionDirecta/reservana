@@ -2,3 +2,8 @@
 node_modules/
 *.log
 .env.local
+AGENTS.md
+CLAUDE.md
+next-env.d.ts
+package-lock.json
+tsconfig.json
