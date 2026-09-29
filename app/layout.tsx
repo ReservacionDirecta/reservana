@@ -1,3 +1,5 @@
+import './globals.css';
+
 export const metadata = {
   title: 'Reservana — Beach Club PMS',
   description: 'Gestión de áreas, reservas y consumo para clubes de playa.',
