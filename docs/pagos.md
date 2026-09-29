@@ -1,18 +1,22 @@
-# Integración de Pagos — Reservana
+# Pagos — Reservana Beach Club
 
-## Plataformas soportadas (fase 2)
-- **Cashea** (BNPL — Buy Now Pay Later) — SDK oficial: `npm install cashea-web-checkout-sdk`
-- **Pago Móvil** (transferencia inmediata — Venecos/Venezuela)
-- **Cripto** (USDT / BTC via wallet link o QR)
-- **QR de consumo** — generado por la reserva; muestra total al escanear
+## Cashea SDK (`npm install cashea-web-checkout-sdk`)
+Flujo:
+1. Usuario confirma consumo (`ConsumptionPanel` → botón `Pagar con Cashea`).
+2. SDK (`CheckoutSDK`) crea orden con `payload`: `deliveryMethod: IN_STORE`, `merchantName`, `orders`, `products`, `identificationNumber`, `redirectUrl`.
+3. Usuario completa pago en Cashea; redirige a `redirectUrl` (`https://reservana.com.ve/retorno?idNumber=...`).
+4. El club confirma/cancela la orden con `idNumber`; `closeReservation` calcula el total (`$`).
 
-## SDK Cashea
-```bash
-npm install cashea-web-checkout-sdk
+Configuración (`.env.local`):
 ```
-Configuración en `public/index.html` o componente React:
-```typescript
-import CheckoutSDK from 'cashea-web-checkout-sdk';
-const sdk = new CheckoutSDK({ apiKey: process.env.CASHEA_API_KEY });
+CASHEA_API_KEY=tu_api_key
+CASHEA_REDIRECT_URL=https://reservana.com.ve/retorno
 ```
-Flujo: usuario confirma consumo → botón "Pagar con Cashea" → SDK abre checkout → redirección con `idNumber` → confirmación en `redirectUrl`.
+
+## Pago Móvil (transferencia bancaria — Venezuela)
+- Enlace o formulario para transferencia bancaria (referencia, monto, confirmación manual por el club).
+- La confirmación se hace manualmente por el club (no hay SDK automático).
+
+## Cripto (`USDT / BTC`)
+- Enlace para pago con `USDT` (`wallet address` o `QR` de wallet).
+- Confirmación manual por el club.

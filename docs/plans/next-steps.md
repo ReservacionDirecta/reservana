@@ -47,3 +47,15 @@
 - El despliegue debe mantenerse ligero (`Dockerfile` multi-stage, `output: standalone`, `.dockerignore`).
 - Los pagos en producción deben usar `Cashea SDK` con `redirectUrl` configurado (`https://reservana.com.ve/retorno`).
 - El onboarding debe ser accesible para administradores no técnicos (texto en español, pasos guiados, sin código).
+
+
+## Estado actual (2026-09-29)
+- Fase 1 (modelos): ✅
+- Fase 2 (componentes): ✅
+- Fase 3 (operativo + LiveStatusBadge + closeReservation): ✅
+- Fase 4 (buscador `/search`, `ClubCard`, `/club/[id]`, `/admin`, `/onboarding`, multi-select sombrillas, detalles): ✅
+- HeroUI (`Solaris Light` / `Tokyo Night`): ✅ (manual, `Tailwind v4`).
+- Cashea SDK (`docs/pagos.md`, botón en `ConsumptionPanel`): ✅ (`npm install`, `v1.1.19`).
+- UI/UX táctil (`minHeight: 120px`, botón `56px`): ✅.
+- Build (`npm run build`): `PASS` (`Next.js 15.1.6`).
+- Repo (`github.com/ReservacionDirecta/reservana`): actualizado con todos los commits.
