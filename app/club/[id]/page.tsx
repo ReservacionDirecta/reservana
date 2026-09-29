@@ -10,8 +10,8 @@ import { BeachArea } from '../../models/beach';
 import { BeachReservation } from '../../models/reservation';
 import { BeachConsumption } from '../../models/consumption';
 
-export default function ClubDetailPage({ params }: { params: { id: string } }) {
-  const clubId = params.id;
+export default function ClubDetailPage({ params }: { params: any }) {
+  const clubId = params?.id || params?.id || '';
 
   const [areas] = useState<BeachArea[]>([
     { id: 1, clubId: 'club-01', type: '2', meta: { vista_mar: true, sombra: false }, coordenadas: 'A-1' },
