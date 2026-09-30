@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, use } from 'react';
 import AreaCard from '../../components/AreaCard';
 import ReservationForm from '../../components/ReservationForm';
 import QRAccess from '../../components/QRAccess';
@@ -10,8 +10,9 @@ import { BeachArea } from '../../models/beach';
 import { BeachReservation } from '../../models/reservation';
 import { BeachConsumption } from '../../models/consumption';
 
-export default function ClubDetailPage({ params }: { params: any }) {
-  const clubId = params?.id || params?.id || '';
+export default function ClubDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params);
+  const clubId = (id as string) || 'club-01';
 
   const [areas] = useState<BeachArea[]>([
     { id: 1, clubId: 'club-01', type: '2', meta: { vista_mar: true, sombra: false }, coordenadas: 'A-1' },
