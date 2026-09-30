@@ -85,15 +85,13 @@ export default function ClubDetailPage({ params }: { params: Promise<{ id: strin
       }}
     >
       <header style={{ marginBottom: '2rem' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '.5rem', marginBottom: '.25rem' }}>
-          <span style={{ fontSize: '1.25rem' }} aria-hidden="true">🌊</span>
-          <h1 style={{ color: 'var(--blue)', fontSize: '2rem', fontWeight: 800, margin: 0, letterSpacing: '-0.02em' }}>
-            Club — {clubId}
-          </h1>
+        <div style={{ position: 'relative', height: '240px', borderRadius: '1rem', overflow: 'hidden', marginBottom: '1.5rem', boxShadow: '0 8px 24px var(--shadow)' }}>
+          <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1200&q=80" alt="Club de playa en Margarita" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+          <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, background: 'linear-gradient(transparent, rgba(15,17,23,.85))', padding: '2rem 1.5rem .75rem', color: '#fff' }}>
+            <h1 style={{ fontSize: '2rem', fontWeight: 800, letterSpacing: '-.03em', margin: 0, textShadow: '0 2px 8px rgba(0,0,0,.5)' }}>Club — {clubId}</h1>
+            <p style={{ margin: '.25rem 0 0', opacity: .9, fontSize: '.95rem', textShadow: '0 1px 4px rgba(0,0,0,.4)' }}>Isla Margarita · Venezuela</p>
+          </div>
         </div>
-        <p style={{ color: 'var(--muted)', fontSize: '.95rem', margin: 0 }}>
-          Mapa interactivo, reservas y consumo en vivo.
-        </p>
       </header>
 
       <section
@@ -115,27 +113,60 @@ export default function ClubDetailPage({ params }: { params: Promise<{ id: strin
             paddingLeft: '.6rem',
           }}
         >
-          🗺️ Mapa del club
+          🎬 Selección de sombrillas — Estilo cine
         </h2>
-        <p style={{ color: 'var(--muted)', fontSize: '.9rem', marginBottom: '1rem' }}>
-          Toca un área para seleccionarla, reservar y ver su consumo.
+        <p style={{ color: 'var(--muted)', fontSize: '.85rem', marginBottom: '1rem' }}>
+          Haz clic en las sombrillas para seleccionar. Verde = libre, Dorado = reservada, Rojo = ocupada, Azul = consumiendo.
         </p>
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))',
-            gap: '.75rem',
+            gridTemplateColumns: 'repeat(4, 1fr)',
+            gap: '.5rem',
+            maxWidth: 600,
+            margin: '0 auto',
           }}
         >
-          {areas.map((area) => (
-            <AreaCard
-              key={area.id}
-              area={area}
-              onSelect={handleSelect}
-              status={statusMap[Number(area.id)] || 'libre'}
-              selected={selectedIds.includes(area.id)}
-            />
-          ))}
+          {areas.map((area) => {
+            const s = (statusMap[Number(area.id)] || 'libre') as 'libre' | 'reservada' | 'ocupada' | 'consumiendo';
+            const colors = {
+              libre: { bg: '#052e16', text: '#f4f4f4', label: 'Libre' },
+              reservada: { bg: '#422006', text: '#f4f4f4', label: 'Reservada' },
+              ocupada: { bg: '#450a0a', text: '#f4f4f4', label: 'Ocupada' },
+              consumiendo: { bg: '#0a1c36', text: '#f4f4f4', label: 'Consumiendo' },
+            };
+            return (
+              <button
+                key={area.id}
+                onClick={() => handleSelect(area.id)}
+                aria-label={`Sombrilla ${area.id} — ${colors[s].label}`}
+                style={{
+                  background: colors[s].bg,
+                  color: colors[s].text,
+                  border: selectedIds.includes(area.id) ? '3px solid var(--gold)' : '1px solid var(--border)',
+                  borderRadius: '.75rem',
+                  padding: '.75rem',
+                  minHeight: '120px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '.25rem',
+                  cursor: 'pointer',
+                  transition: 'all .2s ease',
+                  boxShadow: selectedIds.includes(area.id) ? '0 0 12px var(--gold)' : 'none',
+                  fontWeight: 700,
+                }}
+              >
+                <span style={{ fontSize: '2.5rem', opacity: .8 }}>⛱</span>
+                <span style={{ fontSize: '.9rem', fontWeight: 600 }}>{area.id}</span>
+                <span style={{ fontSize: '.75rem', opacity: .9 }}>{colors[s].label}</span>
+                <span style={{ fontSize: '.65rem', opacity: .7 }}>
+                  {area.type === '2' ? '2 personas' : area.type === '4' ? '4 personas' : '6-12 personas'}
+                </span>
+              </button>
+            );
+          })}
         </div>
       </section>
 
